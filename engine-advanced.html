@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Engine Analytics — ROI Calculator (Advanced)</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #f0f4f8; display: flex; justify-content: center; align-items: flex-start; min-height: 100vh; padding: 2rem 1rem; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
+  .wrap { background: #fff; border-radius: 16px; padding: 2rem; width: 100%; max-width: 680px; border: 0.5px solid #dde6f0; }
+  .engine-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.75rem; padding-bottom: 1.25rem; border-bottom: 0.5px solid #dde6f0; }
+  .engine-logo { font-size: 15px; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; color: #1a3a5c; }
+  .engine-logo span { color: #2b7fd4; }
+  .plan-badge { font-size: 11px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; background: #1a3a5c; color: #fff; padding: 4px 10px; border-radius: 6px; }
+  .calc-title { font-size: 12px; color: #7a9ab8; margin-top: 4px; text-align: right; }
+  .section-title { font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #2b7fd4; margin-bottom: 1rem; }
+  .slider-row { display: flex; align-items: center; gap: 12px; margin-bottom: 1rem; }
+  .slider-row label { font-size: 13px; color: #3a5a78; min-width: 230px; }
+  .slider-row input[type=range] { flex: 1; -webkit-appearance: none; appearance: none; height: 4px; border-radius: 2px; background: #dde6f0; outline: none; }
+  .slider-row input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 16px; height: 16px; border-radius: 50%; background: #2b7fd4; cursor: pointer; }
+  .slider-val { font-size: 13px; font-weight: 600; color: #2b7fd4; min-width: 64px; text-align: right; }
+  .divider { border: none; border-top: 0.5px solid #dde6f0; margin: 1.5rem 0; }
+  .metrics-grid { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 10px; margin-bottom: 1.5rem; }
+  .metric { background: #f4f8fc; border-radius: 10px; padding: 1rem; border: 0.5px solid #dde6f0; }
+  .metric.highlight { background: #1a3a5c; border-color: #1a3a5c; }
+  .metric .m-label { font-size: 11px; color: #7a9ab8; margin-bottom: 6px; }
+  .metric .m-value { font-size: 20px; font-weight: 600; color: #1a3a5c; }
+  .metric.highlight .m-label { color: rgba(255,255,255,0.55); }
+  .metric.highlight .m-value { color: #fff; }
+  .metric .m-sub { font-size: 11px; color: #a0b8cc; margin-top: 4px; }
+  .metric.highlight .m-sub { color: rgba(255,255,255,0.4); }
+  .payback-wrap { margin-bottom: 1.5rem; }
+  .payback-top { display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 8px; }
+  .payback-top span:first-child { color: #7a9ab8; }
+  .payback-top span:last-child { color: #2b7fd4; font-weight: 600; }
+  .bar-bg { background: #dde6f0; border-radius: 4px; height: 8px; overflow: hidden; }
+  .bar-fill { height: 8px; border-radius: 4px; background: #2b7fd4; transition: width 0.3s; }
+  .bar-ticks { display: flex; justify-content: space-between; font-size: 11px; color: #a0b8cc; margin-top: 5px; }
+  .assumptions { background: #f4f8fc; border-radius: 10px; padding: 1rem 1.25rem; border: 0.5px solid #dde6f0; }
+  .ass-row { display: flex; justify-content: space-between; font-size: 12px; padding: 5px 0; border-bottom: 0.5px solid #dde6f0; }
+  .ass-row:last-child { border-bottom: none; }
+  .ass-row span:first-child { color: #7a9ab8; }
+  .ass-row span:last-child { color: #1a3a5c; font-weight: 600; }
+  .footer { display: flex; justify-content: space-between; align-items: center; margin-top: 1.25rem; padding-top: 1rem; border-top: 0.5px solid #dde6f0; }
+  .footer-note { font-size: 11px; color: #a0b8cc; }
+  .footer-url { font-size: 11px; color: #2b7fd4; text-decoration: none; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="engine-header">
+    <div class="engine-logo"><span>ENGINE</span> Analytics</div>
+    <div style="text-align:right;">
+      <div class="plan-badge">Advanced plan</div>
+      <div class="calc-title">ROI calculator — agency data infrastructure</div>
+    </div>
+  </div>
+
+  <p class="section-title">Your inputs</p>
+
+  <div class="slider-row">
+    <label>Hours/month spent on manual reporting</label>
+    <input type="range" id="hours" min="5" max="80" step="5" value="20" oninput="update()">
+    <span class="slider-val" id="hours-out">20 hrs</span>
+  </div>
+  <div class="slider-row">
+    <label>Hourly cost of that person (£)</label>
+    <input type="range" id="rate" min="20" max="150" step="5" value="40" oninput="update()">
+    <span class="slider-val" id="rate-out">£40</span>
+  </div>
+  <div class="slider-row">
+    <label>Reporting hours automated by Engine</label>
+    <input type="range" id="pct" min="50" max="95" step="5" value="80" oninput="update()">
+    <span class="slider-val" id="pct-out">80%</span>
+  </div>
+
+  <hr class="divider">
+  <p class="section-title">Return</p>
+
+  <div class="metrics-grid">
+    <div class="metric">
+      <p class="m-label">Time saved/month</p>
+      <p class="m-value" id="hrs-saved">—</p>
+      <p class="m-sub">Hours freed up</p>
+    </div>
+    <div class="metric">
+      <p class="m-label">Annual saving (£)</p>
+      <p class="m-value" id="annual-saving">—</p>
+      <p class="m-sub">Cost of time reclaimed</p>
+    </div>
+    <div class="metric highlight">
+      <p class="m-label">Payback period</p>
+      <p class="m-value" id="payback">—</p>
+      <p class="m-sub">Months to break even</p>
+    </div>
+  </div>
+
+  <div class="payback-wrap">
+    <div class="payback-top">
+      <span>Break-even progress (12 months)</span>
+      <span id="roi-label">—</span>
+    </div>
+    <div class="bar-bg"><div class="bar-fill" id="roi-bar" style="width:0%"></div></div>
+    <div class="bar-ticks"><span>Month 0</span><span>3</span><span>6</span><span>9</span><span>12</span></div>
+  </div>
+
+  <p class="section-title">Engine investment</p>
+  <div class="assumptions">
+    <div class="ass-row"><span>Set-up fee (one-off)</span><span>£10,000</span></div>
+    <div class="ass-row"><span>Monthly retainer</span><span>£1,000/mo</span></div>
+    <div class="ass-row"><span>Total year-one investment</span><span>£22,000</span></div>
+    <div class="ass-row"><span>Year two onwards (retainer only)</span><span>£12,000/yr</span></div>
+  </div>
+
+  <div class="footer">
+    <span class="footer-note">Based on time saved only — excludes revenue uplift from better attribution</span>
+    <a class="footer-url" href="https://engineanalytics.tech">engineanalytics.tech</a>
+  </div>
+</div>
+<script>
+function update() {
+  const hours = parseInt(document.getElementById('hours').value);
+  const rate = parseInt(document.getElementById('rate').value);
+  const pct = parseInt(document.getElementById('pct').value);
+  document.getElementById('hours-out').textContent = hours + ' hrs';
+  document.getElementById('rate-out').textContent = '£' + rate;
+  document.getElementById('pct-out').textContent = pct + '%';
+  const hrsSaved = Math.round(hours * pct / 100);
+  const monthlySaving = Math.round(hrsSaved * rate);
+  const annualSaving = monthlySaving * 12;
+  const totalInvestment = 22000;
+  const paybackMonths = monthlySaving > 0 ? totalInvestment / monthlySaving : 999;
+  document.getElementById('hrs-saved').textContent = hrsSaved + ' hrs';
+  document.getElementById('annual-saving').textContent = '£' + annualSaving.toLocaleString();
+  document.getElementById('payback').textContent = paybackMonths <= 36 ? Math.ceil(paybackMonths) + ' mo' : '36+ mo';
+  const fillPct = Math.max(0, 100 - Math.min((paybackMonths / 12) * 100, 100));
+  document.getElementById('roi-bar').style.width = fillPct + '%';
+  const yearOneReturn = annualSaving - totalInvestment;
+  document.getElementById('roi-label').textContent = yearOneReturn >= 0
+    ? '£' + Math.abs(yearOneReturn).toLocaleString() + ' net yr-1'
+    : '£' + Math.abs(yearOneReturn).toLocaleString() + ' to break even';
+}
+update();
+</script>
+</body>
+</html>
