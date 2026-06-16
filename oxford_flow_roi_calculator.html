@@ -1,0 +1,293 @@
+
+<h2 class="sr-only">ROI calculator showing time and money Oxford Flow would save by consolidating Salesforce, GA4, LinkedIn Ads, and SEMrush into a single data view</h2>
+
+<style>
+  .calc { font-family: var(--font-sans); padding: 0 0 2rem; }
+  .section-label { font-size: 11px; font-weight: 500; color: var(--color-text-tertiary); letter-spacing: 0.08em; text-transform: uppercase; margin: 0 0 12px; }
+  .source-grid { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 10px; margin-bottom: 1.5rem; }
+  .source-card { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 12px 14px; }
+  .source-header { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+  .source-icon { width: 28px; height: 28px; border-radius: var(--border-radius-md); display: flex; align-items: center; justify-content: center; font-size: 15px; flex-shrink: 0; }
+  .source-name { font-size: 13px; font-weight: 500; color: var(--color-text-primary); }
+  .source-sub { font-size: 11px; color: var(--color-text-tertiary); }
+  .slider-row { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+  .slider-label { font-size: 12px; color: var(--color-text-secondary); width: 110px; flex-shrink: 0; }
+  .slider-row input[type=range] { flex: 1; }
+  .slider-val { font-size: 12px; font-weight: 500; color: var(--color-text-primary); width: 40px; text-align: right; flex-shrink: 0; }
+  .global-row { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 10px; margin-bottom: 1.5rem; }
+  .global-card { background: var(--color-background-secondary); border-radius: var(--border-radius-md); padding: 12px 14px; }
+  .global-card label { font-size: 12px; color: var(--color-text-secondary); display: block; margin-bottom: 6px; }
+  .global-card input[type=range] { width: 100%; }
+  .global-card .gval { font-size: 18px; font-weight: 500; color: var(--color-text-primary); margin-top: 4px; }
+  .results-grid { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 10px; margin-bottom: 1.5rem; }
+  .result-card { background: var(--color-background-secondary); border-radius: var(--border-radius-md); padding: 14px 16px; }
+  .result-label { font-size: 12px; color: var(--color-text-secondary); margin: 0 0 6px; }
+  .result-value { font-size: 22px; font-weight: 500; color: var(--color-text-primary); margin: 0; }
+  .result-sub { font-size: 11px; color: var(--color-text-tertiary); margin: 3px 0 0; }
+  .result-card.highlight { background: #E1F5EE; }
+  .result-card.highlight .result-label { color: #0F6E56; }
+  .result-card.highlight .result-value { color: #085041; }
+  .result-card.highlight .result-sub { color: #0F6E56; }
+  .breakdown-card { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 1rem 1.25rem; margin-bottom: 1.5rem; }
+  .breakdown-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+  .breakdown-row:last-child { margin-bottom: 0; }
+  .br-name { font-size: 13px; color: var(--color-text-secondary); width: 110px; flex-shrink: 0; }
+  .br-bar-bg { flex: 1; height: 8px; background: var(--color-background-secondary); border-radius: 4px; overflow: hidden; }
+  .br-bar { height: 100%; border-radius: 4px; transition: width 0.3s; }
+  .br-hrs { font-size: 12px; color: var(--color-text-secondary); width: 52px; text-align: right; flex-shrink: 0; }
+  .br-save { font-size: 12px; color: #0F6E56; width: 56px; text-align: right; flex-shrink: 0; }
+  .cta-row { display: flex; gap: 10px; }
+  .cta-row button { flex: 1; }
+  .divider { height: 0.5px; background: var(--color-border-tertiary); margin: 1.25rem 0; }
+</style>
+
+<div class="calc">
+
+  <p class="section-label">Data sources</p>
+  <div class="source-grid">
+
+    <div class="source-card">
+      <div class="source-header">
+        <div class="source-icon" style="background:#E6F1FB;">
+          <i class="ti ti-brand-salesforce" style="color:#185FA5;" aria-hidden="true"></i>
+        </div>
+        <div>
+          <div class="source-name">Salesforce</div>
+          <div class="source-sub">CRM · pipeline · deals</div>
+        </div>
+      </div>
+      <div class="slider-row">
+        <span class="slider-label">hrs/week pulling</span>
+        <input type="range" min="1" max="15" step="1" value="5" id="sf-hrs" oninput="calc()">
+        <span class="slider-val" id="sf-hrs-out">5h</span>
+      </div>
+      <div class="slider-row">
+        <span class="slider-label">manual reports</span>
+        <input type="range" min="0" max="10" step="1" value="3" id="sf-rep" oninput="calc()">
+        <span class="slider-val" id="sf-rep-out">3</span>
+      </div>
+    </div>
+
+    <div class="source-card">
+      <div class="source-header">
+        <div class="source-icon" style="background:#FAECE7;">
+          <i class="ti ti-brand-google-analytics" style="color:#993C1D;" aria-hidden="true"></i>
+        </div>
+        <div>
+          <div class="source-name">GA4</div>
+          <div class="source-sub">web · funnel · conversions</div>
+        </div>
+      </div>
+      <div class="slider-row">
+        <span class="slider-label">hrs/week pulling</span>
+        <input type="range" min="1" max="15" step="1" value="4" id="ga-hrs" oninput="calc()">
+        <span class="slider-val" id="ga-hrs-out">4h</span>
+      </div>
+      <div class="slider-row">
+        <span class="slider-label">manual reports</span>
+        <input type="range" min="0" max="10" step="1" value="2" id="ga-rep" oninput="calc()">
+        <span class="slider-val" id="ga-rep-out">2</span>
+      </div>
+    </div>
+
+    <div class="source-card">
+      <div class="source-header">
+        <div class="source-icon" style="background:#E6F1FB;">
+          <i class="ti ti-brand-linkedin" style="color:#185FA5;" aria-hidden="true"></i>
+        </div>
+        <div>
+          <div class="source-name">LinkedIn Ads</div>
+          <div class="source-sub">spend · leads · CPL</div>
+        </div>
+      </div>
+      <div class="slider-row">
+        <span class="slider-label">hrs/week pulling</span>
+        <input type="range" min="1" max="15" step="1" value="3" id="li-hrs" oninput="calc()">
+        <span class="slider-val" id="li-hrs-out">3h</span>
+      </div>
+      <div class="slider-row">
+        <span class="slider-label">manual reports</span>
+        <input type="range" min="0" max="10" step="1" value="2" id="li-rep" oninput="calc()">
+        <span class="slider-val" id="li-rep-out">2</span>
+      </div>
+    </div>
+
+    <div class="source-card">
+      <div class="source-header">
+        <div class="source-icon" style="background:#EAF3DE;">
+          <i class="ti ti-chart-line" style="color:#3B6D11;" aria-hidden="true"></i>
+        </div>
+        <div>
+          <div class="source-name">SEMrush</div>
+          <div class="source-sub">SEO · keywords · rank</div>
+        </div>
+      </div>
+      <div class="slider-row">
+        <span class="slider-label">hrs/week pulling</span>
+        <input type="range" min="1" max="15" step="1" value="2" id="sem-hrs" oninput="calc()">
+        <span class="slider-val" id="sem-hrs-out">2h</span>
+      </div>
+      <div class="slider-row">
+        <span class="slider-label">manual reports</span>
+        <input type="range" min="0" max="10" step="1" value="1" id="sem-rep" oninput="calc()">
+        <span class="slider-val" id="sem-rep-out">1</span>
+      </div>
+    </div>
+
+  </div>
+
+  <p class="section-label">Team assumptions</p>
+  <div class="global-row">
+    <div class="global-card">
+      <label>Analysts pulling data</label>
+      <input type="range" min="1" max="8" step="1" value="2" id="analysts" oninput="calc()">
+      <div class="gval" id="analysts-out">2 analysts</div>
+    </div>
+    <div class="global-card">
+      <label>Avg. analyst cost (£/hr)</label>
+      <input type="range" min="20" max="120" step="5" value="55" id="rate" oninput="calc()">
+      <div class="gval" id="rate-out">£55/hr</div>
+    </div>
+    <div class="global-card">
+      <label>Time reclaimed by automation</label>
+      <input type="range" min="50" max="95" step="5" value="75" id="efficiency" oninput="calc()">
+      <div class="gval" id="efficiency-out">75%</div>
+    </div>
+    <div class="global-card">
+      <label>Hrs saved per report (cross-source)</label>
+      <input type="range" min="0.5" max="4" step="0.5" value="1.5" id="hrs-per-rep" oninput="calc()">
+      <div class="gval" id="hrs-per-rep-out">1.5h</div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+  <p class="section-label">Estimated savings</p>
+
+  <div class="results-grid">
+    <div class="result-card">
+      <p class="result-label">Hours saved / week</p>
+      <p class="result-value" id="hrs-week">—</p>
+      <p class="result-sub" id="hrs-year-sub">— hrs / year</p>
+    </div>
+    <div class="result-card">
+      <p class="result-label">Cost saved / month</p>
+      <p class="result-value" id="cost-month">—</p>
+      <p class="result-sub" id="cost-year-sub">— / year</p>
+    </div>
+    <div class="result-card highlight">
+      <p class="result-label">Annual value unlocked</p>
+      <p class="result-value" id="total-value">—</p>
+      <p class="result-sub" id="roi-sub">incl. decision speed premium</p>
+    </div>
+  </div>
+
+  <div class="breakdown-card">
+    <p class="section-label" style="margin-bottom:14px;">Time saved by source (hrs/week)</p>
+    <div class="breakdown-row">
+      <span class="br-name">Salesforce</span>
+      <div class="br-bar-bg"><div class="br-bar" id="bar-sf" style="background:#378ADD;"></div></div>
+      <span class="br-hrs" id="val-sf">—</span>
+      <span class="br-save" id="save-sf">—</span>
+    </div>
+    <div class="breakdown-row">
+      <span class="br-name">GA4</span>
+      <div class="br-bar-bg"><div class="br-bar" id="bar-ga" style="background:#D85A30;"></div></div>
+      <span class="br-hrs" id="val-ga">—</span>
+      <span class="br-save" id="save-ga">—</span>
+    </div>
+    <div class="breakdown-row">
+      <span class="br-name">LinkedIn Ads</span>
+      <div class="br-bar-bg"><div class="br-bar" id="bar-li" style="background:#185FA5;"></div></div>
+      <span class="br-hrs" id="val-li">—</span>
+      <span class="br-save" id="save-li">—</span>
+    </div>
+    <div class="breakdown-row">
+      <span class="br-name">SEMrush</span>
+      <div class="br-bar-bg"><div class="br-bar" id="bar-sem" style="background:#639922;"></div></div>
+      <span class="br-hrs" id="val-sem">—</span>
+      <span class="br-save" id="save-sem">—</span>
+    </div>
+    <div class="breakdown-row">
+      <span class="br-name">Cross-source</span>
+      <div class="br-bar-bg"><div class="br-bar" id="bar-cross" style="background:#7F77DD;"></div></div>
+      <span class="br-hrs" id="val-cross">—</span>
+      <span class="br-save" id="save-cross">—</span>
+    </div>
+  </div>
+
+  <div class="cta-row">
+    <button onclick="sendPrompt('Based on these ROI numbers, help me write a one-page business case for Oxford Flow showing the value of integrating Salesforce, GA4, LinkedIn Ads and SEMrush into a single view. Include payback period and qualitative benefits. ↗')">Turn this into a business case ↗</button>
+    <button onclick="sendPrompt('What qualitative benefits beyond time savings should I highlight to Oxford Flow when pitching the data integration? Think about decision speed, attribution clarity, and reporting confidence. ↗')">What else to highlight ↗</button>
+  </div>
+
+</div>
+
+<script>
+function fmt(n) { return '£' + Math.round(n).toLocaleString('en-GB'); }
+function fmtH(n) { return Math.round(n * 10) / 10 + 'h'; }
+
+function calc() {
+  const sfH = +document.getElementById('sf-hrs').value;
+  const gaH = +document.getElementById('ga-hrs').value;
+  const liH = +document.getElementById('li-hrs').value;
+  const semH = +document.getElementById('sem-hrs').value;
+  const sfR = +document.getElementById('sf-rep').value;
+  const gaR = +document.getElementById('ga-rep').value;
+  const liR = +document.getElementById('li-rep').value;
+  const semR = +document.getElementById('sem-rep').value;
+  const analysts = +document.getElementById('analysts').value;
+  const rate = +document.getElementById('rate').value;
+  const eff = +document.getElementById('efficiency').value / 100;
+  const hpr = +document.getElementById('hrs-per-rep').value;
+
+  document.getElementById('sf-hrs-out').textContent = sfH + 'h';
+  document.getElementById('ga-hrs-out').textContent = gaH + 'h';
+  document.getElementById('li-hrs-out').textContent = liH + 'h';
+  document.getElementById('sem-hrs-out').textContent = semH + 'h';
+  document.getElementById('sf-rep-out').textContent = sfR;
+  document.getElementById('ga-rep-out').textContent = gaR;
+  document.getElementById('li-rep-out').textContent = liR;
+  document.getElementById('sem-rep-out').textContent = semR;
+  document.getElementById('analysts-out').textContent = analysts + (analysts === 1 ? ' analyst' : ' analysts');
+  document.getElementById('rate-out').textContent = '£' + rate + '/hr';
+  document.getElementById('efficiency-out').textContent = Math.round(eff * 100) + '%';
+  document.getElementById('hrs-per-rep-out').textContent = hpr + 'h';
+
+  const sfSave = sfH * eff * analysts;
+  const gaSave = gaH * eff * analysts;
+  const liSave = liH * eff * analysts;
+  const semSave = semH * eff * analysts;
+  const totalReps = (sfR + gaR + liR + semR);
+  const crossSave = totalReps * hpr * eff;
+
+  const totalHrsWeek = sfSave + gaSave + liSave + semSave + crossSave;
+  const totalHrsYear = totalHrsWeek * 52;
+  const costMonth = totalHrsWeek * 4.33 * rate;
+  const costYear = costMonth * 12;
+  const decisionPremium = costYear * 0.15;
+  const totalValue = costYear + decisionPremium;
+
+  document.getElementById('hrs-week').textContent = Math.round(totalHrsWeek) + ' hrs';
+  document.getElementById('hrs-year-sub').textContent = Math.round(totalHrsYear).toLocaleString('en-GB') + ' hrs / year';
+  document.getElementById('cost-month').textContent = fmt(costMonth);
+  document.getElementById('cost-year-sub').textContent = fmt(costYear) + ' / year';
+  document.getElementById('total-value').textContent = fmt(totalValue);
+
+  const maxSave = Math.max(sfSave, gaSave, liSave, semSave, crossSave, 0.1);
+
+  function setBar(id, valId, saveId, hrs, barMax) {
+    const pct = Math.round((hrs / barMax) * 100);
+    document.getElementById(id).style.width = pct + '%';
+    document.getElementById(valId).textContent = fmtH(hrs) + '/wk';
+    document.getElementById(saveId).textContent = '-' + fmtH(hrs);
+  }
+
+  setBar('bar-sf', 'val-sf', 'save-sf', sfSave, maxSave);
+  setBar('bar-ga', 'val-ga', 'save-ga', gaSave, maxSave);
+  setBar('bar-li', 'val-li', 'save-li', liSave, maxSave);
+  setBar('bar-sem', 'val-sem', 'save-sem', semSave, maxSave);
+  setBar('bar-cross', 'val-cross', 'save-cross', crossSave, maxSave);
+}
+
+calc();
+</script>
