@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ENGINE | Jet Asia ROI Calculator</title>
+<style>
+:root{--blue:#005393;--ink:#183247;--muted:#64798c;--line:#d8e4ee;--bg:#f3f7fb;--pale:#eaf2fa;--green:#16764f}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);font-family:Inter,Segoe UI,Arial,sans-serif;color:var(--ink)}
+header{background:white;border-bottom:4px solid var(--blue);padding:22px max(20px,calc((100% - 1040px)/2)) 24px}
+.brand-logo{display:block;width:min(330px,72vw);height:auto;margin:0 0 20px}
+.eyebrow{font-size:11px;text-transform:uppercase;letter-spacing:.13em;color:var(--muted);font-weight:700}
+h1{font-size:clamp(28px,4vw,40px);margin:8px 0}.sub{max-width:720px;color:var(--muted);font-size:14px;line-height:1.55}
+main{max-width:1040px;margin:26px auto;padding:0 18px 48px}
+.progress{display:flex;align-items:center;gap:12px;margin:0 0 20px;color:var(--muted);font-size:13px;font-weight:700}
+.step{display:flex;align-items:center;gap:8px}.bubble{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;background:#dce6f0;color:var(--blue)}
+.step.active .bubble,.step.done .bubble{background:var(--blue);color:white}.connector{height:2px;width:55px;background:#d5e0eb}
+.card{background:white;border:1px solid var(--line);border-radius:16px;padding:24px;box-shadow:0 4px 18px #193d5d0b}
+h2{margin:0 0 6px;color:var(--blue);font-size:19px}.desc{font-size:13px;color:var(--muted);line-height:1.5;margin:0 0 20px}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
+label{display:block;font-size:13px;font-weight:700;margin-bottom:7px}
+input,select{width:100%;padding:12px;border:1px solid #cbd8e5;border-radius:9px;background:#fff;color:var(--ink);font-size:16px}
+input:focus{outline:2px solid #a9c5e2;border-color:var(--blue)}.help{font-size:11px;color:#8392a2;margin-top:5px}
+.section{border-top:1px solid var(--line);padding-top:20px;margin-top:22px}
+.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:24px}
+button{border:0;border-radius:9px;background:var(--blue);color:white;padding:13px 19px;font-weight:750;font-size:14px;cursor:pointer}
+button.secondary{background:#e8eff6;color:var(--blue)}
+.hidden{display:none}
+.reporthead{display:flex;justify-content:space-between;gap:15px;align-items:start}
+.hero{display:grid;grid-template-columns:1.2fr 1fr 1fr;gap:12px;margin:22px 0}
+.hero .tile{background:var(--blue);color:white;border-radius:14px;padding:20px}
+.hero .tile:nth-child(2){background:#e8f1fa;color:var(--blue)}.hero .tile:nth-child(3){background:#e7f4ed;color:var(--green)}
+.kicker{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;opacity:.8}
+.big{font-size:clamp(27px,4vw,39px);font-weight:850;letter-spacing:-.04em;margin:8px 0 4px}
+.caption{font-size:11px;line-height:1.4;opacity:.85}
+.compare{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:18px}
+.metric{padding:18px;border:1px solid var(--line);border-radius:12px}
+.metric small{font-size:11px;color:var(--muted);font-weight:800;letter-spacing:.06em}
+.metric strong{display:block;font-size:25px;color:var(--blue);margin:7px 0}
+.track{height:14px;background:#e9eff5;border-radius:20px;overflow:hidden}.fill{height:100%;background:var(--blue);width:100%}.fill.after{background:#6b9bc5}
+.details{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:16px}
+.detail{background:#f4f7fa;border-radius:11px;padding:15px}.detail span{font-size:11px;color:var(--muted);display:block}.detail b{font-size:18px;color:var(--ink);display:block;margin-top:5px}
+.note{font-size:11px;line-height:1.55;color:var(--muted);background:#f5f8fb;border-radius:10px;padding:13px;margin-top:18px}.grant-toggle{background:#f2f6fa;border:1px solid var(--line);padding:13px;border-radius:10px}.toggle-label{display:flex;align-items:center;gap:10px;margin:0;font-size:14px}.toggle-label input{width:18px;height:18px;accent-color:var(--blue)}
+.footer{text-align:center;font-size:11px;color:#8795a4;padding:20px}
+@media(max-width:650px){.grid,.hero,.compare,.details{grid-template-columns:1fr}.card{padding:18px}.reporthead{display:block}}
+@media print{body{background:white}.progress,.actions,header{display:none!important}main{margin:0;padding:0}.card{box-shadow:none;border:0;padding:0}.hero .tile{-webkit-print-color-adjust:exact;print-color-adjust:exact}}
+</style></head>
+<body>
+<header><img class="brand-logo" src="data:image/png;base64,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" alt="ENGINE logo"><div class="eyebrow">Client business case · Singapore dollars</div>
+<h1>Aviation Cost Platform<br>ROI Calculator</h1>
+<div class="sub">Estimate the potential monthly operating savings and first-year investment case for Jet Asia.</div></header>
+<main>
+<div class="progress" id="progress">
+ <div class="step active" id="stepOne"><span class="bubble">1</span> Enter inputs</div><div class="connector"></div>
+ <div class="step" id="stepTwo"><span class="bubble">2</span> View report</div>
+</div>
+<section id="inputScreen" class="card">
+<h2>Your current operations</h2><p class="desc">Enter a few details about the current trip-cost estimation process. The report will apply a conservative 30% monthly operating-cost reduction assumption.</p>
+<div class="grid">
+<div><label for="trips">Trips operated per month</label><input id="trips" type="number" min="0" value="80"></div>
+<div><label for="estimates">Estimates prepared per month</label><input id="estimates" type="number" min="0" value="120"><div class="help">Include quotes that never result in a flight.</div></div>
+<div><label for="aircraft">Aircraft under management</label><input id="aircraft" type="number" min="0" value="8"></div>
+<div><label for="legs">Average legs per trip</label><input id="legs" type="number" min="0" value="2"></div>
+</div>
+<div class="section"><h2>Current monthly cost assumptions</h2><p class="desc">Estimate the labour and cost leakage currently associated with trip costing.</p>
+<div class="grid">
+<div><label for="prep">Preparation time per estimate (minutes)</label><input id="prep" type="number" min="0" value="30"></div>
+<div><label for="review">Review and revision time (minutes)</label><input id="review" type="number" min="0" value="20"></div>
+<div><label for="people">People involved per estimate</label><input id="people" type="number" min="0" step=".1" value="2"></div>
+<div><label for="rate">Loaded cost per person / hour (S$)</label><input id="rate" type="number" min="0" step=".01" value="45"></div>
+<div><label for="miss">Trips with a missed cost category (%)</label><input id="miss" type="number" min="0" max="100" step=".1" value="10"></div>
+<div><label for="gap">Average cost gap per affected trip (S$)</label><input id="gap" type="number" min="0" step=".01" value="500"></div>
+<div class="full"><label for="absorber">Who absorbs the cost difference?</label><select id="absorber"><option value="1">Jet Asia absorbs 100%</option><option value=".5">Shared equally (50/50)</option><option value="0">Client absorbs 100%</option></select></div>
+</div></div>
+<div class="section"><h2>Project investment</h2><div class="grid">
+<div><label for="investment">Year 1 build + AMS investment (S$)</label><input id="investment" type="number" min="0" step=".01" value="107380"></div>
+</div></div>
+<div class="section"><h2>EDGE Grant scenario</h2><p class="desc">Model potential grant support against the S$99,540 build cost. AMS is excluded because maintenance costs are non-supported under the Large-scale Digital Transformation activity.</p>
+<div class="grid">
+<div class="full grant-toggle"><label for="edgeEnabled" class="toggle-label"><input id="edgeEnabled" type="checkbox"> Include potential EDGE Grant support</label></div>
+<div><label for="eligibleCost">Estimated eligible project cost (S$)</label><input id="eligibleCost" type="number" min="0" step=".01" value="99540" disabled><div class="help">Default: S$99,540 build cost. AMS is excluded from this amount.</div></div>
+<div><label for="grantRate">Illustrative grant support (%)</label><input id="grantRate" type="number" min="0" max="50" step="1" value="50" disabled><div class="help">Capped at 50% for this scenario.</div></div>
+</div>
+<div class="note">EDGE support is subject to applicant eligibility, project scope, eligible-cost rules and approval. The S$99,540 build amount is an indicative eligible-cost assumption, not a confirmed approved amount. AMS / maintenance is excluded. Confirm the final cost breakdown and supportable scope with Enterprise Singapore.</div>
+</div>
+<div class="note"><b>Model assumptions:</b> AWS costs are excluded. Estimated savings are capped at 30% of current monthly operating costs. This is an illustrative planning assumption, not a guaranteed result.</div>
+<div class="actions"><button onclick="generateReport()">Generate ROI report →</button></div>
+</section>
+<section id="reportScreen" class="hidden">
+<div class="reporthead"><div><div class="eyebrow">ENGINE · Jet Asia</div><h1 style="margin-top:6px">Your ROI report</h1><p class="sub">Estimated financial impact based on the inputs provided.</p></div></div>
+<div class="hero">
+<div class="tile"><div class="kicker">Estimated monthly savings</div><div class="big" id="monthlySavings">—</div><div class="caption">30% reduction in current monthly operating costs</div></div>
+<div class="tile"><div class="kicker">Monthly cost reduction</div><div class="big">30%</div><div class="caption">Conservative modelled operating-cost reduction</div></div>
+<div class="tile"><div class="kicker">Payback period</div><div class="big" id="payback">—</div><div class="caption">Based on estimated monthly savings</div></div>
+</div>
+<div class="card">
+<h2>Before vs after</h2><p class="desc">Illustrative monthly operating cost comparison.</p>
+<div class="compare">
+<div class="metric"><small>BEFORE · CURRENT MONTHLY COST</small><strong id="beforeCost">—</strong><div class="track"><div class="fill" style="width:100%"></div></div></div>
+<div class="metric"><small>AFTER · ESTIMATED MONTHLY COST</small><strong id="afterCost">—</strong><div class="track"><div class="fill after" style="width:70%"></div></div></div>
+</div>
+<div class="details">
+<div class="detail"><span>Annual operating savings</span><b id="annualSavings">—</b></div>
+<div class="detail"><span>Year 1 build + AMS investment</span><b id="investmentOut">—</b></div>
+<div class="detail"><span>Estimated monthly cost after platform</span><b id="afterCostDetail">—</b></div>
+</div>
+<div class="details" id="grantResults" style="display:none">
+<div class="detail"><span>Illustrative EDGE Grant support</span><b id="grantAmount">—</b></div>
+<div class="detail"><span>Estimated investment after grant</span><b id="netInvestment">—</b></div>
+<div class="detail"><span>Revised payback after grant</span><b id="grantPayback">—</b></div>
+</div>
+<div class="note" id="calculationNote"></div>
+<div class="actions"><button class="secondary" onclick="editInputs()">← Edit inputs</button><button onclick="window.print()">Print / Save report as PDF</button></div>
+</div>
+</section>
+</main><div class="footer">ENGINE · Aviation Cost Platform · Preliminary ROI assessment</div>
+<script>
+const $=id=>document.getElementById(id), val=id=>Math.max(0,Number($(id).value)||0);
+const money=x=>'S$'+Math.round(x).toLocaleString('en-SG');
+function generateReport(){
+ const trips=val('trips'),est=val('estimates'),prep=val('prep'),review=val('review'),people=val('people'),rate=val('rate');
+ const labour=est*(prep+review)*people/60*rate;
+ const leakage=trips*val('miss')/100*val('gap')*Number($('absorber').value);
+ const current=labour+leakage;
+ const savings=current*.30;
+ const after=current-savings;
+ const investment=val('investment');
+ const annual=savings*12;
+ const grantOn=$('edgeEnabled').checked;
+ const eligible=Math.min(val('eligibleCost'),investment);
+ const grantRate=Math.min(50,val('grantRate'))/100;
+ const grant=grantOn?eligible*grantRate:0;
+ const netInvestment=Math.max(0,investment-grant);
+ const payback=savings>0?investment/savings:null;
+ const grantPayback=savings>0?netInvestment/savings:null;
+ $('monthlySavings').textContent=money(savings);
+ $('payback').textContent=payback===null?'Not achieved':payback.toFixed(1)+' months';
+ $('beforeCost').textContent=money(current);$('afterCost').textContent=money(after);
+ $('annualSavings').textContent=money(annual);$('investmentOut').textContent=money(investment);$('afterCostDetail').textContent=money(after);
+ $('grantResults').style.display=grantOn?'grid':'none';
+ $('grantAmount').textContent=money(grant);
+ $('netInvestment').textContent=money(netInvestment);
+ $('grantPayback').textContent=grantPayback===null?'Not achieved':grantPayback.toFixed(1)+' months';
+ $('calculationNote').textContent='Calculation: current monthly operating cost = labour cost ('+money(labour)+') + estimated cost leakage absorbed by Jet Asia ('+money(leakage)+'). Modelled monthly savings = 30% × '+money(current)+' = '+money(savings)+'. Annual operating savings = 12 × monthly savings = '+money(annual)+'. Base payback = Year 1 build + AMS investment ('+money(investment)+') ÷ monthly savings. '+(grantOn?'Illustrative EDGE Grant scenario: build cost excluding AMS, assumed eligible at '+money(eligible)+' × '+(grantRate*100).toFixed(0)+'% = '+money(grant)+' potential support; net investment after assumed support = '+money(netInvestment)+'. ':'')+'AWS costs are excluded. Assumes savings accrue for 12 full months and does not account for implementation ramp-up. EDGE support is not guaranteed and depends on eligibility, approved scope, eligible costs and approval.';
+ $('inputScreen').classList.add('hidden');$('reportScreen').classList.remove('hidden');
+ $('stepOne').classList.add('done');$('stepOne').classList.remove('active');$('stepTwo').classList.add('active');
+ window.scrollTo({top:0,behavior:'smooth'});
+}
+$('edgeEnabled').addEventListener('change',e=>{ $('eligibleCost').disabled=!e.target.checked; $('grantRate').disabled=!e.target.checked; });
+$('grantRate').addEventListener('change',e=>{ if(Number(e.target.value)>50)e.target.value=50; if(Number(e.target.value)<0)e.target.value=0; });
+function editInputs(){
+ $('reportScreen').classList.add('hidden');$('inputScreen').classList.remove('hidden');
+ $('stepTwo').classList.remove('active');$('stepOne').classList.remove('done');$('stepOne').classList.add('active');
+ window.scrollTo({top:0,behavior:'smooth'});
+}
+</script></body></html>
